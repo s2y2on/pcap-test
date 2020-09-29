@@ -26,8 +26,6 @@ void usage() {
 	printf("sample: pcap_test wlan0\n");
 }
 
-char errbuf[PCAP_ERRBUF_SIZE];
-
 void etherHandle(const u_char *pk)
 {
 	pk_eth = (struct etherhdr *)pk;
@@ -83,14 +81,10 @@ int main(int argc, char* argv[]) {
 	}
 
 	char* dev = argv[1];
+	char errbuf[PCAP_ERRBUF_SIZE];
 	pcap_t* handle = pcap_open_live(argv1[1], BUFSIZ, 1, 1000, errbuf);
-
-	if (dev == NULL) {
-		fprintf(stderr, "Can't find default device: %s\n", errbuf);
-		return 1;
-	}
-	if (handle == NULL) {
-		fprintf(stderr, "Can't find default device %s: %s\n", dev, errbuf);
+	if (handle == nullptr) {
+		fprintf(stderr, "pcap_open_live(%s) return nullptr - %s\n", dev, errbuf);
 		return 1;
 	}
 
@@ -102,7 +96,10 @@ int main(int argc, char* argv[]) {
 		const u_char* pk;
 		int res = pcap_next_ex(handle, &hd, &pk);
 		if (res == 0) continue;
-		if (res == -1 || res == -2) break;
+		if (res == -1 || res == -2) {
+			printf("pcap_next_ex return %d(%s)\n", res, pcap_geterr(handle));
+			break;
+		}
 		printf("Packet Length: %u\n", hd->caplen);
 
 		etherHandle(pk);
