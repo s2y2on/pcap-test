@@ -16,7 +16,6 @@ struct tcphdr *tcph;
 // ip_version = 4
 // ip_frag_offset = 5;
 
-
 void usage() {
   printf("syntax: pcap_test <interface>\n");
   printf("sample: pcap_test wlan0\n");
